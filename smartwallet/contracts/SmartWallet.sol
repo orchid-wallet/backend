@@ -9,6 +9,7 @@ contract SmartWallet is ZKPVerifier {
     address payable admin;
     address successor;
     uint64 public constant TRANSFER_REQUEST_ID = 1;
+    uint64 public vote_state = 0;
 
 
     mapping(uint256 => address) public idToAddress;
@@ -29,6 +30,7 @@ contract SmartWallet is ZKPVerifier {
         ICircuitValidator validator
     ) internal view override {
         // check that the challenge input of the proof is equal to the msg.sender 
+        // TODO I don't think we need this logic, delete later
         address addr = GenesisUtils.int256ToAddress(
             inputs[validator.getChallengeInputIndex()]
         );
@@ -47,6 +49,8 @@ contract SmartWallet is ZKPVerifier {
             requestId == TRANSFER_REQUEST_ID && addressToId[_msgSender()] == 0,
             "proof can not be submitted more than once"
         );
+        //change state
+        vote_state = 1;
     }
 
     function withdrawAmount(uint256 amount) public onlyOwner {

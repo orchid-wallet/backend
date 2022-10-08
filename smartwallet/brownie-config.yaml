@@ -1,0 +1,2 @@
+networks:
+    default: ${DEFAULT_NETWORK}

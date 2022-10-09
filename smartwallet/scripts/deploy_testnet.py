@@ -2,17 +2,22 @@ from brownie import *
 
 def main():
     #set up EOA accounts we are using
-    deployer_acc = accounts.load("mumbai_bogota")
+    #deployer_acc = accounts.load("mumbai_bogota")
 
     #deploy smart contract wallet
-    deployed_contract = SmartWallet.deploy(deployer_acc, {'from': deployer_acc})
+    vote_threshold = 2
+    #deployed_contract = SmartWallet.deploy(deployer_acc, vote_threshold, {'from': deployer_acc})
 
-    #deployed_contract = SmartWallet.at("0x4EacCF9900AEA894b9c8C8E745C965dc59c8D525")
+    deployed_contract = SmartWallet.at("0xbF342BEB15ee704274ceF4ee8a780Aa140a626fF")
 
     request_id = deployed_contract.TRANSFER_REQUEST_ID()
     request_queries = deployed_contract.requestQueries(request_id)
-
+    contract_state = deployed_contract.vote_state()
     print(request_queries)
+    print("the state is {}".format(contract_state))
+
+    print("the threshold is {}".format(deployed_contract.vote_threshold()))
+
     validatorAdress = "0xb1e86C4c687B85520eF4fd2a0d14e81970a15aFB"
     circuit_id = "credentialAtomicQuerySig"
     value_array = [0]*64
@@ -20,15 +25,17 @@ def main():
     print(value_array)
 
 
-    query_as_dict = {"schema" : 226278358248531717314681006190884971985,
-                     "slotIndex": 1,
+    schema_int = 278334752384909982388055862178842950570
+
+    query_as_dict = {"schema" : schema_int,
+                     "slotIndex": 2,
                      "operator": 1,
                      "value": value_array,
                      "circuitId": circuit_id,
                      }
-    query_as_list = [226278358248531717314681006190884971985, 1, 1, value_array, circuit_id]
+    query_as_list = [schema_int, 2, 1, value_array, circuit_id]
     
-    deployed_contract.setZKPRequest(request_id, validatorAdress, query_as_list, {'from': deployer_acc})
+    #deployed_contract.setZKPRequest(request_id, validatorAdress, query_as_list, {'from': deployer_acc})
 
     return
 

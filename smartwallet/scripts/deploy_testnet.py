@@ -2,13 +2,16 @@ from brownie import *
 
 def main():
     #set up EOA accounts we are using
-    #deployer_acc = accounts.load("mumbai_bogota")
+    deployer_acc = accounts.load("mumbai_bogota")
+    # my mobile dev wallet: 0x2786e104380d5Afb9E964D85F46EB6152Ef7b67E
+    successor_acc = "0x2786e104380d5Afb9E964D85F46EB6152Ef7b67E"
 
     #deploy smart contract wallet
-    vote_threshold = 2
-    #deployed_contract = SmartWallet.deploy(deployer_acc, vote_threshold, {'from': deployer_acc})
+    #vote_threshold = 2
+    #deployed_contract = SmartWallet.deploy(successor_acc, vote_threshold, {'from': deployer_acc})
 
-    deployed_contract = SmartWallet.at("0xbF342BEB15ee704274ceF4ee8a780Aa140a626fF")
+
+    deployed_contract = SmartWallet.at("0x6Ebe504f7bda4fd60584e0BCA07B4f81b96112a5")
 
     request_id = deployed_contract.TRANSFER_REQUEST_ID()
     request_queries = deployed_contract.requestQueries(request_id)

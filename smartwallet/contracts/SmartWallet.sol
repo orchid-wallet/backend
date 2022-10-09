@@ -8,7 +8,8 @@ import "./verifiers/ZKPVerifier.sol";
 contract SmartWallet is ZKPVerifier {
 
     address successor;
-    address old_owner;
+    address old_admin;
+    address admin;
     uint64 public constant TRANSFER_REQUEST_ID = 1;
     uint64 public vote_state = 0;
     uint64 public vote_threshold;
@@ -21,12 +22,13 @@ contract SmartWallet is ZKPVerifier {
     event Transfer(uint256 amount);
     event Received(address sender, uint256 amount);
     event VoteReceived(uint256 id);
-    event OwnerChanged(address old_owner, address new_owner);
+    event AdminChanged(address old_admin, address new_admin);
 
-    constructor (address _successor, uint64 _vote_threshold) public {
+    constructor (address _successor, uint64 _vote_threshold) {
         //set successor as next in line for ownership
         successor = _successor;
         vote_threshold = _vote_threshold;
+        admin = msg.sender;
     }
 
     function _beforeProofSubmit(
@@ -35,7 +37,6 @@ contract SmartWallet is ZKPVerifier {
         ICircuitValidator validator
     ) internal view override {
         // check that the challenge input of the proof is equal to the msg.sender 
-        // TODO I don't think we need this logic, delete later
         address addr = GenesisUtils.int256ToAddress(
             inputs[validator.getChallengeInputIndex()]
         );
@@ -60,10 +61,11 @@ contract SmartWallet is ZKPVerifier {
         _countVote(id);
     }
 
-    function withdrawAmount(uint256 amount) public onlyOwner {
+    function withdrawAmount(uint256 amount) public {
+        require (msg.sender == admin);
         require (amount <= getBalance());
         
-        payable(owner()).transfer(amount);
+        payable(admin).transfer(amount);
         emit Transfer(amount);
  
     }
@@ -80,10 +82,10 @@ contract SmartWallet is ZKPVerifier {
         // check if votes have reach threshold
         if (vote_state == vote_threshold){
             //transfer ownership
-            old_owner = owner();
-            //TODO Transfer ownership
-            // _transferOwnership(successor);
-            emit OwnerChanged(old_owner, owner());
+            old_admin = admin;
+            //Transfer ownership
+            admin = successor;
+            emit AdminChanged(old_admin, admin);
         }
         
         emit VoteReceived(id);

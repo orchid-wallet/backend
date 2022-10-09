@@ -13,7 +13,7 @@ interface IPUSHCommInterface {
 
 contract SmartWallet is ZKPVerifier {
 
-    address push_service;
+    IPUSHCommInterface push_service;
     address successor;
     address old_admin;
     address admin;
